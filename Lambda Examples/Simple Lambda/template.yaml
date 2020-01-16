@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This is simple lambda example
+Parameters:
+  MyS3Bucket:
+    Description: S3 bucket that be stored source code
+    Type: String
+    Default: atercatus-cloudformation-test
+
+Resources:
+  Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: Atercatus-Lambda
+      Handler: index.handler
+      Role: !GetAtt
+        - LambdaRole
+        - Arn
+      Code:
+        S3Bucket: !Ref MyS3Bucket
+        S3Key: index.zip # only .zip file
+      Runtime: nodejs12.x
+      Timeout: 300
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: AWSLambdaBasicExecutionRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: AmazonS3FullAccess
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: s3:*
+                Resource:
+                  - arn:aws:s3:::exchange-data-raw
+                  - arn:aws:s3:::exchange-data-raw/*
