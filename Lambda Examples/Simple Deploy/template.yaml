@@ -14,6 +14,13 @@ Resources:
     Properties:
       Name: my-api
 
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: "{proxy+}"
+      RestApiId: !Ref ApiGateway
+
   ApiGatewayRootMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -25,7 +32,8 @@ Resources:
         Uri: !Sub
           - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
           - lambdaArn: !GetAtt "LambdaFunction.Arn"
-      ResourceId: !GetAtt ApiGateway.RootResourceId
+      # ResourceId: !GetAtt ApiGateway.RootResourceId
+      ResourceId: !Ref ApiGatewayResource
       RestApiId: !Ref ApiGateway
 
   ApiGatewayDeployment:
@@ -43,6 +51,7 @@ Resources:
         ZipFile: |
           exports.handler = async event => {
             // TODO implement
+            console.log("test");
             const response = {
               statusCode: 200,
               body: JSON.stringify("Hello from Lambda!")
@@ -86,9 +95,11 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
+                  - logs:DescribeLogStreams
                 Effect: Allow
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaName}
+                  - arn:aws:logs:*:*:*
+                  # - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaName}
           PolicyName: lambda
 
   LambdaLogGroup:
