@@ -98,8 +98,7 @@ Resources:
                   - logs:DescribeLogStreams
                 Effect: Allow
                 Resource:
-                  - arn:aws:logs:*:*:*
-                  # - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaName}
+                  - !GetAtt LambdaLogGroup.Arn
           PolicyName: lambda
 
   LambdaLogGroup:
