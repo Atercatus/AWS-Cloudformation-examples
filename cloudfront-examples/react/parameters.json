@@ -1,0 +1,7 @@
+[
+  { "ParameterKey": "EnvironmentName", "ParameterValue": "myEnv" },
+  {
+    "ParameterKey": "BucketName",
+    "ParameterValue": "simplesosimple3fbb"
+  }
+]
